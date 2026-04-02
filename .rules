@@ -1,3 +1,11 @@
+# Fork changes
+
+This is a fork of Zed IDE with the following modifications:
+
+- **Copy with Reference** (`Cmd+Ctrl+C`): Copies selected text with `From: @<relative path>` prepended. Available in right-click context menu, Edit menu, and via shortcut.
+- **Breadcrumb "Copy Path"**: Right-clicking the file path header now copies `@<relative path>` instead of the absolute path.
+- **Search "Copy Paths" button**: A button on the far right of the project search toolbar that copies the relative paths (with `@` prefix) of all expanded files, one per line.
+
 # Rust coding guidelines
 
 * Prioritize code correctness and clarity. Speed and efficiency are secondary priorities unless otherwise specified.
