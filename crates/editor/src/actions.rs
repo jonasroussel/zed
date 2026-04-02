@@ -458,6 +458,8 @@ actions!(
         Copy,
         /// Copies selected text to the clipboard with leading/trailing whitespace trimmed.
         CopyAndTrim,
+        /// Copies selected text to the clipboard with a file path reference prepended.
+        CopyWithReference,
         /// Copies the current file location to the clipboard.
         CopyFileLocation,
         /// Copies the highlighted text as JSON.

@@ -13965,6 +13965,36 @@ impl Editor {
         self.do_copy(false, cx);
     }
 
+    pub fn copy_with_reference(
+        &mut self,
+        _: &CopyWithReference,
+        _: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let selections = self.selections.all::<Point>(&self.display_snapshot(cx));
+        let first_selection_start = selections.first().map(|s| s.start);
+
+        let relative_path = first_selection_start.and_then(|start| {
+            let project = self.project.as_ref()?.read(cx);
+            let buffer = self.buffer.read(cx);
+            let snapshot = buffer.read(cx);
+            let file = snapshot.file_at(start)?;
+            let path = file.path();
+            Some(path.display(project.path_style(cx)).to_string())
+        });
+
+        self.do_copy(false, cx);
+
+        if let Some(path) = relative_path {
+            if let Some(item) = cx.read_from_clipboard() {
+                if let Some(text) = item.text() {
+                    let referenced_text = format!("From: @{path}\n{text}");
+                    cx.write_to_clipboard(ClipboardItem::new_string(referenced_text));
+                }
+            }
+        }
+    }
+
     fn do_copy(&self, strip_leading_indents: bool, cx: &mut Context<Self>) {
         let selections = self.selections.all::<Point>(&self.display_snapshot(cx));
         let buffer = self.buffer.read(cx).read(cx);

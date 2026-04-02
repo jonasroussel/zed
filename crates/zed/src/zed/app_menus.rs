@@ -162,6 +162,7 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
                 MenuItem::os_action("Cut", editor::actions::Cut, OsAction::Cut),
                 MenuItem::os_action("Copy", editor::actions::Copy, OsAction::Copy),
                 MenuItem::action("Copy and Trim", editor::actions::CopyAndTrim),
+                MenuItem::action("Copy with Reference", editor::actions::CopyWithReference),
                 MenuItem::os_action("Paste", editor::actions::Paste, OsAction::Paste),
                 MenuItem::separator(),
                 MenuItem::action("Find", search::buffer_search::Deploy::find()),

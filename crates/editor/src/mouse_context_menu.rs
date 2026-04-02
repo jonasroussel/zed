@@ -1,5 +1,5 @@
 use crate::{
-    Copy, CopyAndTrim, CopyPermalinkToLine, Cut, DisplayPoint, DisplaySnapshot, Editor,
+    Copy, CopyAndTrim, CopyPermalinkToLine, CopyWithReference, Cut, DisplayPoint, DisplaySnapshot, Editor,
     EvaluateSelectedText, FindAllReferences, GoToDeclaration, GoToDefinition, GoToImplementation,
     GoToTypeDefinition, Paste, Rename, RevealInFileManager, RunToCursor, SelectMode,
     SelectionEffects, SelectionExt, ToDisplayPoint, ToggleCodeActions,
@@ -283,6 +283,7 @@ pub fn deploy_context_menu(
                 .action("Cut", Box::new(Cut))
                 .action("Copy", Box::new(Copy))
                 .action("Copy and Trim", Box::new(CopyAndTrim))
+                .action("Copy with Reference", Box::new(CopyWithReference))
                 .action("Paste", Box::new(Paste))
                 .separator()
                 .action_disabled_when(
