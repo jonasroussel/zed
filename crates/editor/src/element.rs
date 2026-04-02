@@ -8065,16 +8065,16 @@ pub fn render_breadcrumb_text(
                             this.on_right_click({
                                 let editor = editor.clone();
                                 move |_, _, cx| {
-                                    if let Some(abs_path) = editor.upgrade().and_then(|editor| {
+                                    if let Some(path) = editor.upgrade().and_then(|editor| {
                                         editor.update(cx, |editor, cx| {
-                                            editor.target_file_abs_path(cx)
+                                            let project = editor.project()?.read(cx);
+                                            let buffer = editor.active_buffer(cx)?;
+                                            let path = buffer.read(cx).file()?.path();
+                                            let display = path.display(project.path_style(cx));
+                                            Some(format!("@{display}"))
                                         })
                                     }) {
-                                        if let Some(path_str) = abs_path.to_str() {
-                                            cx.write_to_clipboard(ClipboardItem::new_string(
-                                                path_str.to_string(),
-                                            ));
-                                        }
+                                        cx.write_to_clipboard(ClipboardItem::new_string(path));
                                     }
                                 }
                             })
