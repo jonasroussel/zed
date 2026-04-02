@@ -20,9 +20,10 @@ use editor::{
 };
 use futures::{StreamExt, stream::FuturesOrdered};
 use gpui::{
-    Action, AnyElement, App, Axis, Context, Entity, EntityId, EventEmitter, FocusHandle, Focusable,
-    Global, Hsla, InteractiveElement, IntoElement, KeyContext, ParentElement, Point, Render,
-    SharedString, Styled, Subscription, Task, UpdateGlobal, WeakEntity, Window, actions, div,
+    Action, AnyElement, App, Axis, ClipboardItem, Context, Entity, EntityId, EventEmitter,
+    FocusHandle, Focusable, Global, Hsla, InteractiveElement, IntoElement, KeyContext,
+    ParentElement, Point, Render, SharedString, Styled, Subscription, Task, UpdateGlobal,
+    WeakEntity, Window, actions, div,
 };
 use itertools::Itertools;
 use language::{Buffer, Language};
@@ -2319,13 +2320,45 @@ impl Render for ProjectSearchBar {
                 }
             }));
 
+        let copy_paths_button = {
+            let results_editor = search.results_editor.clone();
+            let project = search.entity.read(cx).project.clone();
+            IconButton::new("project-search-copy-paths", IconName::Copy)
+                .shape(IconButtonShape::Square)
+                .tooltip(Tooltip::text(
+                    "Copy relative paths of expanded files with @ prefix",
+                ))
+                .on_click(move |_, _, cx| {
+                    let editor = results_editor.read(cx);
+                    let folded = editor.folded_buffers(cx);
+                    let buffer = editor.buffer().read(cx).read(cx);
+                    let project = project.read(cx);
+                    let path_style = project.path_style(cx);
+
+                    let paths: Vec<String> = buffer
+                        .all_buffer_ids()
+                        .filter(|id| !folded.contains(id))
+                        .filter_map(|id| {
+                            let path_key = buffer.path_for_buffer(id)?;
+                            Some(format!("@{}", path_key.path.display(path_style)))
+                        })
+                        .collect();
+
+                    if !paths.is_empty() {
+                        cx.write_to_clipboard(ClipboardItem::new_string(paths.join("\n")));
+                    }
+                })
+        };
+
         let search_line = h_flex()
             .pl_0p5()
             .w_full()
             .gap_2()
             .child(expand_button)
             .child(query_column)
-            .child(mode_column);
+            .child(mode_column)
+            .child(div().flex_grow())
+            .child(copy_paths_button);
 
         let replace_line = search.replace_enabled.then(|| {
             let replace_column = input_base_styles(InputPanel::Replacement).child(
