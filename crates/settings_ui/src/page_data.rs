@@ -100,6 +100,31 @@ fn developer_page() -> SettingsPage {
                 files: USER,
                 render: crate::pages::render_feature_flags_page,
             }),
+            SettingsPageItem::SectionHeader("Instrumentation"),
+            SettingsPageItem::SettingItem(SettingItem {
+                title: "Performance Profiler",
+                description: "Collect timing data for foreground and background executor tasks so they can be inspected via `zed: open performance profiler`. May lead to increased memory usage.",
+                field: Box::new(SettingField {
+                    json_path: Some("instrumentation.performance_profiler.enabled"),
+                    pick: |settings_content| {
+                        settings_content
+                            .instrumentation
+                            .as_ref()
+                            .and_then(|i| i.performance_profiler.as_ref())
+                            .and_then(|p| p.enabled.as_ref())
+                    },
+                    write: |settings_content, value| {
+                        settings_content
+                            .instrumentation
+                            .get_or_insert_default()
+                            .performance_profiler
+                            .get_or_insert_default()
+                            .enabled = value;
+                    },
+                }),
+                metadata: None,
+                files: USER,
+            }),
         ]),
     }
 }
@@ -6589,7 +6614,7 @@ fn terminal_page() -> SettingsPage {
         ]
     }
 
-    fn behavior_settings_section() -> [SettingsPageItem; 4] {
+    fn behavior_settings_section() -> [SettingsPageItem; 5] {
         [
             SettingsPageItem::SectionHeader("Behavior Settings"),
             SettingsPageItem::SettingItem(SettingItem {
@@ -6645,6 +6670,19 @@ fn terminal_page() -> SettingsPage {
                             .terminal
                             .get_or_insert_default()
                             .keep_selection_on_copy = value;
+                    },
+                }),
+                metadata: None,
+                files: USER,
+            }),
+            SettingsPageItem::SettingItem(SettingItem {
+                title: "Audible Bell",
+                description: "Whether to play a sound when the BEL character (`\\a`, `0x07`) is printed",
+                field: Box::new(SettingField {
+                    json_path: Some("terminal.bell"),
+                    pick: |settings_content| settings_content.terminal.as_ref()?.bell.as_ref(),
+                    write: |settings_content, value| {
+                        settings_content.terminal.get_or_insert_default().bell = value;
                     },
                 }),
                 metadata: None,
